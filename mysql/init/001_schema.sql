@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS customers (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(128) NOT NULL,
+  email VARCHAR(128) UNIQUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS onts (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  device_id VARCHAR(256) NOT NULL UNIQUE,
+  model VARCHAR(128),
+  serial VARCHAR(128),
+  customer_id BIGINT,
+  ssid VARCHAR(64),
+  wifi_key VARCHAR(128),
+  vlan_id INT,
+  pppoe_user VARCHAR(128),
+  pppoe_pass VARCHAR(128),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (customer_id) REFERENCES customers(id)
+);

@@ -1,0 +1,81 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:6
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+
+  genieacs-cwmp:
+    image: genieacs/genieacs:1.2.10
+    restart: unless-stopped
+    environment:
+      - GENIEACS_CWMP_PORT=7547
+      - GENIEACS_NBI_PORT=7557
+      - GENIEACS_UI_PORT=3000
+      - GENIEACS_FS_PORT=7567
+      - GENIEACS_DEBUG=false
+      - GENIEACS_CWMP_INTERFACE=0.0.0.0
+      - GENIEACS_EXT_DIR=/opt/genieacs/ext
+    depends_on:
+      - mongo
+      - redis
+    ports:
+      - "7547:7547"   # CWMP
+      - "7557:7557"   # NBI
+      - "3000:3000"   # UI
+      - "7567:7567"   # FS (firmware server)
+    volumes:
+      - genieacs_ext:/opt/genieacs/ext
+      - ./genieacs/provisions:/opt/genieacs/ext/provisions:ro
+      - ./genieacs/fs:/opt/genieacs/fs:ro
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=acs
+      - MYSQL_USER=acs
+      - MYSQL_PASSWORD=acs
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d:ro
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - GENIEACS_NBI_URL=http://genieacs-cwmp:7557
+      - MONGO_URL=mongodb://mongo:27017/genieacs
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=acs
+      - MYSQL_PASSWORD=acs
+      - MYSQL_DATABASE=acs
+    ports:
+      - "8080:8080"
+    depends_on:
+      - genieacs-cwmp
+      - mongo
+      - mysql
+
+volumes:
+  mongo_data:
+  redis_data:
+  mysql_data:
+  genieacs_ext:
