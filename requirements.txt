@@ -1,0 +1,14 @@
+# TR-069 ACS Server - Dependencias Python
+# Instalación: pip install -r requirements.txt
+
+# No se requieren dependencias externas adicionales
+# El servidor usa únicamente bibliotecas estándar de Python:
+# - http.server (servidor HTTP)
+# - xml.etree.ElementTree (parseo XML/SOAP)
+# - json (gestión de configuración)
+# - logging (registro de eventos)
+
+# Dependencias opcionales para mejoras futuras:
+# flask>=2.3.0  # Para interfaz web más avanzada
+# requests>=2.31.0  # Para cliente HTTP
+# lxml>=4.9.0  # Parser XML más robusto
