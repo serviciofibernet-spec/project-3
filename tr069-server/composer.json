@@ -1,0 +1,66 @@
+{
+    "name": "tr069/server",
+    "description": "Servidor TR-069/CWMP en PHP para gestión de dispositivos CPE",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "TR069 Server",
+            "email": "admin@tr069server.local"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*",
+        "ext-soap": "*",
+        "ext-json": "*",
+        "ext-dom": "*",
+        "ext-simplexml": "*",
+        "ext-mbstring": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
+    "suggest": {
+        "ext-openssl": "Para comunicaciones seguras SSL/TLS",
+        "ext-curl": "Para realizar connection requests a dispositivos CPE",
+        "monolog/monolog": "Para logging avanzado",
+        "symfony/console": "Para comandos CLI de administración"
+    },
+    "autoload": {
+        "psr-4": {
+            "TR069\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TR069\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@php -r \"if(!file_exists('config/config.php')) { echo 'Por favor, ejecute install.php para configurar el servidor.\\n'; }\""
+        ],
+        "test": "phpunit",
+        "check-requirements": [
+            "@php -r \"echo 'Verificando requisitos del sistema...\\n';\"",
+            "@php -r \"if(!extension_loaded('pdo')) { echo '❌ Extensión PDO no encontrada\\n'; exit(1); } else { echo '✅ PDO instalado\\n'; }\"",
+            "@php -r \"if(!extension_loaded('pdo_mysql')) { echo '❌ Extensión PDO MySQL no encontrada\\n'; exit(1); } else { echo '✅ PDO MySQL instalado\\n'; }\"",
+            "@php -r \"if(!extension_loaded('soap')) { echo '❌ Extensión SOAP no encontrada\\n'; exit(1); } else { echo '✅ SOAP instalado\\n'; }\"",
+            "@php -r \"if(!extension_loaded('json')) { echo '❌ Extensión JSON no encontrada\\n'; exit(1); } else { echo '✅ JSON instalado\\n'; }\"",
+            "@php -r \"if(!extension_loaded('dom')) { echo '❌ Extensión DOM no encontrada\\n'; exit(1); } else { echo '✅ DOM instalado\\n'; }\"",
+            "@php -r \"if(!extension_loaded('simplexml')) { echo '❌ Extensión SimpleXML no encontrada\\n'; exit(1); } else { echo '✅ SimpleXML instalado\\n'; }\"",
+            "@php -r \"echo '\\n✅ Todos los requisitos están instalados\\n';\""
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable"
+}

@@ -1,0 +1,41 @@
+# Configuración Apache para la carpeta public
+
+# Activar motor de reescritura
+RewriteEngine On
+
+# Regla especial para el endpoint ACS
+RewriteRule ^acs/?$ acs.php [L,QSA]
+
+# Si el archivo o directorio existe, usarlo directamente
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# De lo contrario, redirigir a index.php
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+# Configuración de índice
+DirectoryIndex index.php
+
+# Configuración de PHP para el endpoint ACS
+<Files "acs.php">
+    # Permitir métodos HTTP necesarios para TR-069
+    <LimitExcept POST GET>
+        Order deny,allow
+        Deny from all
+    </LimitExcept>
+    
+    # Configuración PHP específica para SOAP
+    <IfModule mod_php.c>
+        php_flag soap.wsdl_cache_enabled 0
+        php_value max_execution_time 300
+        php_value memory_limit 256M
+    </IfModule>
+</Files>
+
+# Configuración de seguridad
+Options -Indexes
+Options -MultiViews
+
+# Tipos MIME para TR-069
+AddType text/xml .xml
+AddType application/soap+xml .soap
