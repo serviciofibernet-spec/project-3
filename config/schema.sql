@@ -1,0 +1,53 @@
+-- TR-069 ACS minimal schema
+-- MySQL InnoDB, UTF8MB4
+
+CREATE TABLE IF NOT EXISTS devices (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  oui VARCHAR(16) NOT NULL,
+  product_class VARCHAR(64) NULL,
+  serial_number VARCHAR(128) NOT NULL,
+  manufacturer VARCHAR(128) NULL,
+  software_version VARCHAR(128) NULL,
+  hardware_version VARCHAR(128) NULL,
+  connection_request_url TEXT NULL,
+  ip_address VARCHAR(64) NULL,
+  max_envelopes INT UNSIGNED DEFAULT 1,
+  last_inform_at DATETIME NULL,
+  first_inform_at DATETIME NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uniq_device (oui, product_class, serial_number),
+  KEY idx_sn (serial_number)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS device_parameters (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  device_id BIGINT UNSIGNED NOT NULL,
+  name VARCHAR(512) NOT NULL,
+  value LONGTEXT NULL,
+  type VARCHAR(64) NULL,
+  writable TINYINT(1) DEFAULT 0,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_params_device FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE,
+  UNIQUE KEY uniq_param (device_id, name),
+  KEY idx_name (name(191))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS device_events (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  device_id BIGINT UNSIGNED NOT NULL,
+  event_code VARCHAR(64) NOT NULL,
+  command_key VARCHAR(128) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_events_device FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE,
+  KEY idx_code (event_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS acs_logs (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  level VARCHAR(16) NOT NULL,
+  message TEXT NOT NULL,
+  context JSON NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_level (level)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
