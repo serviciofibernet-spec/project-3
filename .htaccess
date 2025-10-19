@@ -1,0 +1,44 @@
+# TR-069 ACS Server Configuration
+
+# Enable URL rewriting
+RewriteEngine On
+
+# Security headers
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"
+
+# Protect sensitive files
+<Files "config/*">
+    Require all denied
+</Files>
+
+<Files "logs/*">
+    Require all denied
+</Files>
+
+<Files "sql/*">
+    Require all denied
+</Files>
+
+<Files "classes/*">
+    Require all denied
+</Files>
+
+# Allow access to main files
+<Files "*.php">
+    Require all granted
+</Files>
+
+# Directory browsing
+Options -Indexes
+
+# Error pages
+ErrorDocument 404 /index.php
+ErrorDocument 403 /index.php
+
+# PHP settings
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+php_value max_execution_time 300
+php_value memory_limit 256M

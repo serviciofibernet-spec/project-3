@@ -1,0 +1,47 @@
+# TR-069 ACS Server Requirements
+
+## System Requirements
+- PHP 7.4 or higher
+- MySQL 5.7 or MariaDB 10.2+
+- Web server (Apache/Nginx)
+
+## PHP Extensions Required
+- pdo_mysql
+- simplexml
+- curl
+- json
+- mbstring
+- openssl
+
+## Optional PHP Extensions
+- zip (for backups)
+- gd (for charts/graphs)
+- intl (for internationalization)
+
+## Database Privileges Required
+- CREATE (for initial setup)
+- SELECT, INSERT, UPDATE, DELETE (for operations)
+- INDEX (for performance optimization)
+
+## File System Permissions
+- Read/Write access to logs/ directory
+- Read/Write access to config/ directory (during installation)
+- Read access to all other files
+
+## Network Requirements
+- Inbound HTTP/HTTPS access for CPE devices
+- Outbound HTTP access for connection requests (optional)
+- MySQL connection (local or remote)
+
+## Recommended Server Specifications
+- CPU: 1+ cores
+- RAM: 512MB+ (1GB+ for high traffic)
+- Storage: 1GB+ free space
+- Bandwidth: Depends on number of devices
+
+## Security Considerations
+- Use HTTPS in production
+- Configure firewall rules
+- Regular security updates
+- Strong authentication credentials
+- Database access restrictions
