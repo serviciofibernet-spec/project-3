@@ -198,7 +198,9 @@ class TR069Server:
         self.app.router.add_post('/devices/{device_id}/parameters', self.set_device_parameters)
         self.app.router.add_get('/devices/{device_id}/parameters', self.get_device_parameters)
         self.app.router.add_get('/', self.web_interface)
-        self.app.router.add_static('/static', 'static')
+        # Only add static route if directory exists
+        if os.path.exists('static'):
+            self.app.router.add_static('/static', 'static')
     
     async def handle_tr069_request(self, request: Request) -> Response:
         """Handle TR-069 SOAP requests"""

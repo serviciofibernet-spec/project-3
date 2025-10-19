@@ -1,0 +1,6 @@
+2025-10-19 20:12:20,108 - __main__ - INFO - Loaded 0 devices from database
+2025-10-19 20:12:20,108 - __main__ - INFO - Starting TR-069 server on 0.0.0.0:8080
+2025-10-19 20:12:20,108 - __main__ - INFO - TR-069 server started successfully!
+2025-10-19 20:12:20,108 - __main__ - INFO - HTTP server running on http://0.0.0.0:8080
+2025-10-19 20:12:20,108 - __main__ - INFO - Web interface available at http://0.0.0.0:8080/
+2025-10-19 20:12:20,108 - __main__ - INFO - TR-069 endpoint: http://0.0.0.0:8080/tr069
