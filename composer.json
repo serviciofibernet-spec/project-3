@@ -1,0 +1,41 @@
+{
+    "name": "tr069/php-server",
+    "description": "Servidor TR-069 completo en PHP para gestión remota de dispositivos CPE",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "TR069 PHP Server",
+            "email": "admin@tr069-server.local"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "ext-soap": "*",
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*",
+        "ext-json": "*"
+    },
+    "suggest": {
+        "ext-openssl": "Para conexiones HTTPS seguras",
+        "ext-curl": "Para operaciones HTTP externas",
+        "ext-mbstring": "Para mejor soporte de caracteres UTF-8"
+    },
+    "autoload": {
+        "psr-4": {
+            "TR069\\": "src/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "php -r \"if (!extension_loaded('soap')) { echo 'SOAP extension is required but not loaded'; exit(1); }\"",
+            "php -r \"if (!extension_loaded('pdo_sqlite')) { echo 'PDO SQLite extension is required but not loaded'; exit(1); }\""
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
