@@ -1,0 +1,97 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:4.4
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  genieacs-cwmp:
+    image: genieacs/genieacs:1.2.9
+    command: bash -lc "genieacs-cwmp"
+    environment:
+      - GENIEACS_CWMP_PORT=7547
+      - GENIEACS_CWMP_INTERFACE=0.0.0.0
+      - GENIEACS_DEBUG_LEVEL=info
+      - MONGODB_CONNECTION_URL=mongodb://mongo:27017/genieacs
+    depends_on:
+      - mongo
+    ports:
+      - "7547:7547"
+
+  genieacs-nbi:
+    image: genieacs/genieacs:1.2.9
+    command: bash -lc "genieacs-nbi"
+    environment:
+      - GENIEACS_NBI_PORT=7557
+      - GENIEACS_DEBUG_LEVEL=info
+      - MONGODB_CONNECTION_URL=mongodb://mongo:27017/genieacs
+    depends_on:
+      - mongo
+    ports:
+      - "7557:7557"
+
+  genieacs-fs:
+    image: genieacs/genieacs:1.2.9
+    command: bash -lc "genieacs-fs"
+    environment:
+      - GENIEACS_FS_PORT=7567
+      - GENIEACS_DEBUG_LEVEL=info
+      - MONGODB_CONNECTION_URL=mongodb://mongo:27017/genieacs
+    depends_on:
+      - mongo
+    ports:
+      - "7567:7567"
+    volumes:
+      - fs_data:/var/lib/genieacs
+
+  genieacs-ui:
+    image: genieacs/genieacs-ui:1.2.9
+    environment:
+      - GENIEACS_UI_JWT_SECRET=devsecret
+      - GENIEACS_API_HOST=genieacs-nbi
+      - GENIEACS_API_PORT=7557
+    depends_on:
+      - genieacs-nbi
+    ports:
+      - "3000:3000"
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=acs
+      - MYSQL_USER=acs
+      - MYSQL_PASSWORD=acs
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  php:
+    build:
+      context: ./php-backend
+      dockerfile: Dockerfile
+    environment:
+      - GENIEACS_NBI_URL=http://genieacs-nbi:7557
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=acs
+      - MYSQL_PASSWORD=acs
+      - MYSQL_DB=acs
+    depends_on:
+      - genieacs-nbi
+      - mysql
+    ports:
+      - "8080:80"
+    volumes:
+      - ./php-backend:/var/www
+
+volumes:
+  mongo_data:
+  mysql_data:
+  fs_data:

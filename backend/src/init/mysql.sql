@@ -1,0 +1,31 @@
+CREATE TABLE IF NOT EXISTS customers (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  doc_id VARCHAR(128) UNIQUE,
+  phone VARCHAR(64),
+  email VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS profiles (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  model VARCHAR(128),
+  ssid24 VARCHAR(64),
+  pass24 VARCHAR(64),
+  ssid5 VARCHAR(64),
+  pass5 VARCHAR(64),
+  vlan_id INT
+);
+
+CREATE TABLE IF NOT EXISTS devices (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  acs_id VARCHAR(255) UNIQUE, -- GenieACS _id
+  serial VARCHAR(255),
+  model VARCHAR(128),
+  customer_id INT,
+  profile_id INT,
+  INDEX(serial),
+  INDEX(model),
+  FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
+  FOREIGN KEY (profile_id) REFERENCES profiles(id) ON DELETE SET NULL
+);

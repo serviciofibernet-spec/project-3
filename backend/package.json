@@ -1,0 +1,22 @@
+{
+  "name": "acs-backend",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "express": "^4.19.2",
+    "mysql2": "^3.11.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.30",
+    "tsx": "^4.19.1",
+    "typescript": "^5.5.4"
+  }
+}
