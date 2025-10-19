@@ -1,0 +1,48 @@
+# TR-069 ACS .gitignore
+
+# Configuration files (contains sensitive data)
+config.php
+.env
+
+# Logs directory
+logs/
+*.log
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+# Database dumps
+*.sql.gz
+*.sql.zip
+dump.sql
+
+# Temporary files
+tmp/
+temp/
+cache/
+
+# System files
+Thumbs.db
+.directory
+
+# Composer (if used later)
+/vendor/
+composer.lock
+
+# npm/node (if used later)
+node_modules/
+package-lock.json
+
+# Environment files
+.env.local
+.env.*.local
