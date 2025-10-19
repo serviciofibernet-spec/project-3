@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TR-069 ACS - Panel de Administración</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            color: #7f8c8d;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card h2 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌐 TR-069 ACS - Panel de Administración</h1>
+    </div>
+    
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Dispositivos</h3>
+                <div class="value" id="totalDevices">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>En Línea</h3>
+                <div class="value" style="color: #27ae60;" id="onlineDevices">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Fuera de Línea</h3>
+                <div class="value" style="color: #e74c3c;" id="offlineDevices">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Tareas Pendientes</h3>
+                <div class="value" style="color: #f39c12;" id="pendingTasks">-</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Dispositivos ONT</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Número de Serie</th>
+                        <th>Modelo</th>
+                        <th>Cliente</th>
+                        <th>IP</th>
+                        <th>Estado</th>
+                        <th>Última Conexión</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="devicesTable">
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem;">
+                            Cargando dispositivos...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        // API Base URL
+        const API_BASE = '/api/admin';
+        const AUTH_TOKEN = 'Bearer admin-token'; // TODO: Implement proper authentication
+        
+        // Load dashboard stats
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/dashboard/stats`, {
+                    headers: { 'Authorization': AUTH_TOKEN }
+                });
+                const data = await response.json();
+                
+                document.getElementById('totalDevices').textContent = data.total_devices;
+                document.getElementById('onlineDevices').textContent = data.online_devices;
+                document.getElementById('offlineDevices').textContent = data.offline_devices;
+                document.getElementById('pendingTasks').textContent = data.pending_tasks;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        // Load devices
+        async function loadDevices() {
+            try {
+                const response = await fetch(`${API_BASE}/devices`, {
+                    headers: { 'Authorization': AUTH_TOKEN }
+                });
+                const data = await response.json();
+                
+                const tbody = document.getElementById('devicesTable');
+                
+                if (data.devices.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No hay dispositivos registrados</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = data.devices.map(device => `
+                    <tr>
+                        <td>${device.serial_number}</td>
+                        <td>${device.model || '-'}</td>
+                        <td>${device.client_id || 'Sin asignar'}</td>
+                        <td>${device.ip_address || '-'}</td>
+                        <td>
+                            <span class="status-badge status-${device.status}">
+                                ${device.status === 'online' ? 'En línea' : 'Fuera de línea'}
+                            </span>
+                        </td>
+                        <td>${device.last_inform ? new Date(device.last_inform).toLocaleString() : '-'}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="viewDevice(${device.id})">Ver</button>
+                            <button class="btn btn-danger btn-sm" onclick="rebootDevice(${device.id})">Reiniciar</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading devices:', error);
+            }
+        }
+        
+        // View device details
+        function viewDevice(deviceId) {
+            window.location.href = `/admin/device/${deviceId}`;
+        }
+        
+        // Reboot device
+        async function rebootDevice(deviceId) {
+            if (!confirm('¿Está seguro de que desea reiniciar este dispositivo?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/devices/${deviceId}/reboot`, {
+                    method: 'POST',
+                    headers: { 'Authorization': AUTH_TOKEN }
+                });
+                
+                const data = await response.json();
+                alert(data.message || 'Tarea de reinicio creada');
+            } catch (error) {
+                console.error('Error rebooting device:', error);
+                alert('Error al reiniciar el dispositivo');
+            }
+        }
+        
+        // Initialize
+        loadStats();
+        loadDevices();
+        
+        // Refresh every 30 seconds
+        setInterval(() => {
+            loadStats();
+            loadDevices();
+        }, 30000);
+    </script>
+</body>
+</html>

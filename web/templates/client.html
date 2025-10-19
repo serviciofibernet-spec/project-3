@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi ONT - Panel de Cliente</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .device-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .status-online {
+            background: #27ae60;
+            box-shadow: 0 0 10px #27ae60;
+        }
+        
+        .status-offline {
+            background: #e74c3c;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+            margin-top: 0.5rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-item {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .info-item label {
+            display: block;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+        }
+        
+        .info-item value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .signal-quality {
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .signal-excellent { background: #d4edda; color: #155724; }
+        .signal-good { background: #cce5ff; color: #004085; }
+        .signal-fair { background: #fff3cd; color: #856404; }
+        .signal-poor { background: #f8d7da; color: #721c24; }
+        
+        .connected-devices {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .device-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📡 Mi ONT</h1>
+            <p>Gestiona tu conexión WiFi</p>
+        </div>
+        
+        <div class="card">
+            <div class="device-status">
+                <div style="display: flex; align-items: center;">
+                    <span class="status-indicator status-online" id="statusIndicator"></span>
+                    <div>
+                        <div style="font-weight: 600;">Estado del Dispositivo</div>
+                        <div style="font-size: 0.875rem; color: #7f8c8d;" id="statusText">En línea</div>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.75rem; color: #7f8c8d;">Número de Serie</div>
+                    <div style="font-weight: 600;" id="serialNumber">-</div>
+                </div>
+            </div>
+            
+            <div id="signalQuality" class="signal-quality">
+                <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">Calidad de Señal</div>
+                <div style="font-size: 1.5rem; font-weight: bold;" id="signalText">-</div>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Potencia Óptica RX</label>
+                    <value id="opticalRx">-</value>
+                </div>
+                <div class="info-item">
+                    <label>Dispositivos Conectados</label>
+                    <value id="connectedCount">-</value>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 style="margin-bottom: 1.5rem;">Configuración WiFi</h2>
+            
+            <div class="form-group">
+                <label>Nombre de Red WiFi (2.4 GHz)</label>
+                <input type="text" id="ssid24" placeholder="Mi-WiFi">
+            </div>
+            
+            <div class="form-group">
+                <label>Contraseña WiFi (2.4 GHz)</label>
+                <input type="password" id="password24" placeholder="Mínimo 8 caracteres">
+            </div>
+            
+            <div class="form-group">
+                <label>Nombre de Red WiFi (5 GHz)</label>
+                <input type="text" id="ssid5" placeholder="Mi-WiFi-5G">
+            </div>
+            
+            <div class="form-group">
+                <label>Contraseña WiFi (5 GHz)</label>
+                <input type="password" id="password5" placeholder="Mínimo 8 caracteres">
+            </div>
+            
+            <button class="btn btn-primary" onclick="updateWiFi()">
+                💾 Guardar Cambios WiFi
+            </button>
+            
+            <button class="btn btn-secondary" onclick="rebootDevice()">
+                🔄 Reiniciar Dispositivo
+            </button>
+        </div>
+        
+        <div class="card">
+            <h2 style="margin-bottom: 1rem;">Dispositivos Conectados</h2>
+            <div class="connected-devices" id="connectedDevices">
+                <p style="text-align: center; color: #7f8c8d;">Cargando...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration
+        const API_BASE = '/api/client';
+        const AUTH_TOKEN = 'Bearer client-token'; // TODO: Get from login
+        let currentDeviceId = null;
+        
+        // Load device information
+        async function loadDeviceInfo() {
+            try {
+                const response = await fetch(`${API_BASE}/devices`, {
+                    headers: { 'Authorization': AUTH_TOKEN }
+                });
+                const data = await response.json();
+                
+                if (data.devices && data.devices.length > 0) {
+                    const device = data.devices[0]; // Get first device
+                    currentDeviceId = device.id;
+                    
+                    // Update UI
+                    document.getElementById('serialNumber').textContent = device.serial_number;
+                    document.getElementById('statusText').textContent = device.status === 'online' ? 'En línea' : 'Fuera de línea';
+                    document.getElementById('statusIndicator').className = `status-indicator status-${device.status}`;
+                    
+                    if (device.latest_diagnostics) {
+                        const diag = device.latest_diagnostics;
+                        document.getElementById('opticalRx').textContent = diag.optical_power_rx ? `${diag.optical_power_rx} dBm` : '-';
+                    }
+                    
+                    document.getElementById('connectedCount').textContent = device.connected_devices_count || 0;
+                    
+                    // Load detailed info
+                    loadDeviceDetails(device.id);
+                }
+            } catch (error) {
+                console.error('Error loading device info:', error);
+            }
+        }
+        
+        // Load device details
+        async function loadDeviceDetails(deviceId) {
+            try {
+                const response = await fetch(`${API_BASE}/devices/${deviceId}`, {
+                    headers: { 'Authorization': AUTH_TOKEN }
+                });
+                const data = await response.json();
+                
+                // Update WiFi info
+                if (data.wifi_info) {
+                    document.getElementById('ssid24').value = data.wifi_info.ssid_24 || '';
+                    document.getElementById('ssid5').value = data.wifi_info.ssid_5 || '';
+                }
+                
+                // Update signal quality
+                if (data.diagnostics) {
+                    const rx = parseFloat(data.diagnostics.optical_power_rx);
+                    let quality = 'unknown';
+                    let qualityText = 'Desconocido';
+                    
+                    if (rx > -20) {
+                        quality = 'excellent';
+                        qualityText = 'Excelente';
+                    } else if (rx > -25) {
+                        quality = 'good';
+                        qualityText = 'Buena';
+                    } else if (rx > -28) {
+                        quality = 'fair';
+                        qualityText = 'Regular';
+                    } else {
+                        quality = 'poor';
+                        qualityText = 'Mala';
+                    }
+                    
+                    const qualityDiv = document.getElementById('signalQuality');
+                    qualityDiv.className = `signal-quality signal-${quality}`;
+                    document.getElementById('signalText').textContent = qualityText;
+                }
+                
+                // Update connected devices
+                if (data.connected_devices) {
+                    const container = document.getElementById('connectedDevices');
+                    if (data.connected_devices.length === 0) {
+                        container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">No hay dispositivos conectados</p>';
+                    } else {
+                        container.innerHTML = data.connected_devices.map(device => `
+                            <div class="device-item">
+                                <div>
+                                    <div style="font-weight: 600;">${device.hostname || 'Dispositivo desconocido'}</div>
+                                    <div style="font-size: 0.75rem; color: #7f8c8d;">${device.ip_address || '-'}</div>
+                                </div>
+                                <div style="font-size: 0.75rem; color: #7f8c8d;">${device.interface_type || 'WiFi'}</div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading device details:', error);
+            }
+        }
+        
+        // Update WiFi settings
+        async function updateWiFi() {
+            const ssid24 = document.getElementById('ssid24').value;
+            const password24 = document.getElementById('password24').value;
+            const ssid5 = document.getElementById('ssid5').value;
+            const password5 = document.getElementById('password5').value;
+            
+            if (password24 && password24.length < 8) {
+                alert('La contraseña WiFi debe tener al menos 8 caracteres');
+                return;
+            }
+            
+            if (password5 && password5.length < 8) {
+                alert('La contraseña WiFi debe tener al menos 8 caracteres');
+                return;
+            }
+            
+            const config = {};
+            
+            if (ssid24 || password24) {
+                config.wifi_24 = {};
+                if (ssid24) config.wifi_24.ssid = ssid24;
+                if (password24) config.wifi_24.password = password24;
+            }
+            
+            if (ssid5 || password5) {
+                config.wifi_5 = {};
+                if (ssid5) config.wifi_5.ssid = ssid5;
+                if (password5) config.wifi_5.password = password5;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/devices/${currentDeviceId}/wifi`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': AUTH_TOKEN,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(config)
+                });
+                
+                const data = await response.json();
+                alert(data.message || 'Configuración WiFi actualizada. Los cambios se aplicarán en breve.');
+                
+                // Clear password fields
+                document.getElementById('password24').value = '';
+                document.getElementById('password5').value = '';
+            } catch (error) {
+                console.error('Error updating WiFi:', error);
+                alert('Error al actualizar la configuración WiFi');
+            }
+        }
+        
+        // Reboot device
+        async function rebootDevice() {
+            if (!confirm('¿Está seguro de que desea reiniciar su dispositivo? La conexión se interrumpirá temporalmente.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/devices/${currentDeviceId}/reboot`, {
+                    method: 'POST',
+                    headers: { 'Authorization': AUTH_TOKEN }
+                });
+                
+                const data = await response.json();
+                alert(data.message || 'El dispositivo se reiniciará en breve');
+            } catch (error) {
+                console.error('Error rebooting device:', error);
+                alert('Error al reiniciar el dispositivo');
+            }
+        }
+        
+        // Initialize
+        loadDeviceInfo();
+        
+        // Refresh every 30 seconds
+        setInterval(loadDeviceInfo, 30000);
+    </script>
+</body>
+</html>

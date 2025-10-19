@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: tr069-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass123
+      MYSQL_DATABASE: tr069_acs
+      MYSQL_USER: tr069_user
+      MYSQL_PASSWORD: tr069pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - tr069-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: tr069-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - tr069-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 5s
+      retries: 5
+
+  tr069-acs:
+    build: .
+    container_name: tr069-acs
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: tr069_user
+      DB_PASSWORD: tr069pass
+      DB_NAME: tr069_acs
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      ACS_URL: http://localhost:7547
+      ACS_USERNAME: admin
+      ACS_PASSWORD: admin123
+      SECRET_KEY: change-this-in-production
+      FLASK_ENV: production
+      DEBUG: "False"
+    ports:
+      - "7547:7547"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tr069-network
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  scheduler:
+    build: .
+    container_name: tr069-scheduler
+    command: python utils/scheduler.py
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: tr069_user
+      DB_PASSWORD: tr069pass
+      DB_NAME: tr069_acs
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tr069-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  tr069-network:
+    driver: bridge
