@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}Configurar WiFi - {{ ont.serial_number }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Configurar WiFi</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('customer.ont_detail', ont_id=ont.id) }}" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-wifi"></i> Configuración WiFi - {{ ont.serial_number }}
+                </h5>
+                <small class="text-muted">{{ ont.model }}</small>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="wifiForm">
+                    <input type="hidden" name="config_type" value="wifi">
+                    
+                    <!-- WiFi 2.4GHz -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-wifi"></i> WiFi 2.4GHz
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" 
+                                               id="wifi_2_4_enabled" name="wifi_2_4_enabled" 
+                                               {% if not wifi_settings or wifi_settings.wifi_2_4_enabled %}checked{% endif %}>
+                                        <label class="form-check-label" for="wifi_2_4_enabled">
+                                            Habilitar WiFi 2.4GHz
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="wifi_2_4_ssid" class="form-label">Nombre de red (SSID)</label>
+                                        <input type="text" class="form-control" id="wifi_2_4_ssid" 
+                                               name="wifi_2_4_ssid" maxlength="32"
+                                               value="{{ wifi_settings.wifi_2_4_ssid if wifi_settings else '' }}"
+                                               placeholder="MiWiFi-2.4G">
+                                        <div class="form-text">Máximo 32 caracteres</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="wifi_2_4_password" class="form-label">Contraseña</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="wifi_2_4_password" 
+                                                   name="wifi_2_4_password" minlength="8" maxlength="63"
+                                                   value="{{ wifi_settings.wifi_2_4_password if wifi_settings else '' }}"
+                                                   placeholder="Mínimo 8 caracteres">
+                                            <button class="btn btn-outline-secondary" type="button" 
+                                                    onclick="togglePassword('wifi_2_4_password')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="form-text">Mínimo 8 caracteres, máximo 63</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="wifi_2_4_channel" class="form-label">Canal</label>
+                                        <select class="form-select" id="wifi_2_4_channel" name="wifi_2_4_channel">
+                                            <option value="1" {% if wifi_settings and wifi_settings.wifi_2_4_channel == 1 %}selected{% endif %}>1 (2412 MHz)</option>
+                                            <option value="6" {% if not wifi_settings or wifi_settings.wifi_2_4_channel == 6 %}selected{% endif %}>6 (2437 MHz)</option>
+                                            <option value="11" {% if wifi_settings and wifi_settings.wifi_2_4_channel == 11 %}selected{% endif %}>11 (2462 MHz)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="wifi_2_4_security" class="form-label">Seguridad</label>
+                                        <select class="form-select" id="wifi_2_4_security" name="wifi_2_4_security">
+                                            <option value="WPA2-PSK" {% if not wifi_settings or wifi_settings.wifi_2_4_security == 'WPA2-PSK' %}selected{% endif %}>WPA2-PSK (Recomendado)</option>
+                                            <option value="WPA-PSK" {% if wifi_settings and wifi_settings.wifi_2_4_security == 'WPA-PSK' %}selected{% endif %}>WPA-PSK</option>
+                                            <option value="WEP" {% if wifi_settings and wifi_settings.wifi_2_4_security == 'WEP' %}selected{% endif %}>WEP (No recomendado)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- WiFi 5GHz -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-wifi"></i> WiFi 5GHz
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" 
+                                               id="wifi_5_enabled" name="wifi_5_enabled" 
+                                               {% if not wifi_settings or wifi_settings.wifi_5_enabled %}checked{% endif %}>
+                                        <label class="form-check-label" for="wifi_5_enabled">
+                                            Habilitar WiFi 5GHz
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="wifi_5_ssid" class="form-label">Nombre de red (SSID)</label>
+                                        <input type="text" class="form-control" id="wifi_5_ssid" 
+                                               name="wifi_5_ssid" maxlength="32"
+                                               value="{{ wifi_settings.wifi_5_ssid if wifi_settings else '' }}"
+                                               placeholder="MiWiFi-5G">
+                                        <div class="form-text">Máximo 32 caracteres</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="wifi_5_password" class="form-label">Contraseña</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="wifi_5_password" 
+                                                   name="wifi_5_password" minlength="8" maxlength="63"
+                                                   value="{{ wifi_settings.wifi_5_password if wifi_settings else '' }}"
+                                                   placeholder="Mínimo 8 caracteres">
+                                            <button class="btn btn-outline-secondary" type="button" 
+                                                    onclick="togglePassword('wifi_5_password')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="form-text">Mínimo 8 caracteres, máximo 63</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="wifi_5_channel" class="form-label">Canal</label>
+                                        <select class="form-select" id="wifi_5_channel" name="wifi_5_channel">
+                                            <option value="36" {% if not wifi_settings or wifi_settings.wifi_5_channel == 36 %}selected{% endif %}>36 (5180 MHz)</option>
+                                            <option value="40" {% if wifi_settings and wifi_settings.wifi_5_channel == 40 %}selected{% endif %}>40 (5200 MHz)</option>
+                                            <option value="44" {% if wifi_settings and wifi_settings.wifi_5_channel == 44 %}selected{% endif %}>44 (5220 MHz)</option>
+                                            <option value="48" {% if wifi_settings and wifi_settings.wifi_5_channel == 48 %}selected{% endif %}>48 (5240 MHz)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="wifi_5_security" class="form-label">Seguridad</label>
+                                        <select class="form-select" id="wifi_5_security" name="wifi_5_security">
+                                            <option value="WPA2-PSK" {% if not wifi_settings or wifi_settings.wifi_5_security == 'WPA2-PSK' %}selected{% endif %}>WPA2-PSK (Recomendado)</option>
+                                            <option value="WPA-PSK" {% if wifi_settings and wifi_settings.wifi_5_security == 'WPA-PSK' %}selected{% endif %}>WPA-PSK</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('customer.ont_detail', ont_id=ont.id) }}" 
+                           class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar Configuración
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle"></i> Información
+                </h6>
+            </div>
+            <div class="card-body">
+                <h6>Recomendaciones de Seguridad</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Usa contraseñas de al menos 8 caracteres</li>
+                    <li><i class="fas fa-check text-success"></i> Combina letras, números y símbolos</li>
+                    <li><i class="fas fa-check text-success"></i> Evita información personal</li>
+                    <li><i class="fas fa-check text-success"></i> Usa WPA2-PSK para mejor seguridad</li>
+                </ul>
+                
+                <h6 class="mt-3">Canales Recomendados</h6>
+                <ul class="list-unstyled">
+                    <li><strong>2.4GHz:</strong> 1, 6, 11 (sin solapamiento)</li>
+                    <li><strong>5GHz:</strong> 36, 40, 44, 48 (canales bajos)</li>
+                </ul>
+                
+                <div class="alert alert-info mt-3">
+                    <small>
+                        <i class="fas fa-lightbulb"></i>
+                        <strong>Tip:</strong> Los cambios se aplicarán automáticamente a la ONT. 
+                        Los dispositivos conectados se desconectarán temporalmente.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const button = input.nextElementSibling;
+    const icon = button.querySelector('i');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+// Validación del formulario
+document.getElementById('wifiForm').addEventListener('submit', function(e) {
+    const wifi24Enabled = document.getElementById('wifi_2_4_enabled').checked;
+    const wifi5Enabled = document.getElementById('wifi_5_enabled').checked;
+    
+    if (!wifi24Enabled && !wifi5Enabled) {
+        e.preventDefault();
+        alert('Debe habilitar al menos una red WiFi (2.4GHz o 5GHz)');
+        return;
+    }
+    
+    if (wifi24Enabled) {
+        const ssid24 = document.getElementById('wifi_2_4_ssid').value.trim();
+        const pass24 = document.getElementById('wifi_2_4_password').value;
+        
+        if (!ssid24) {
+            e.preventDefault();
+            alert('Debe especificar un nombre para la red WiFi 2.4GHz');
+            return;
+        }
+        
+        if (pass24.length < 8) {
+            e.preventDefault();
+            alert('La contraseña WiFi 2.4GHz debe tener al menos 8 caracteres');
+            return;
+        }
+    }
+    
+    if (wifi5Enabled) {
+        const ssid5 = document.getElementById('wifi_5_ssid').value.trim();
+        const pass5 = document.getElementById('wifi_5_password').value;
+        
+        if (!ssid5) {
+            e.preventDefault();
+            alert('Debe especificar un nombre para la red WiFi 5GHz');
+            return;
+        }
+        
+        if (pass5.length < 8) {
+            e.preventDefault();
+            alert('La contraseña WiFi 5GHz debe tener al menos 8 caracteres');
+            return;
+        }
+    }
+});
+
+// Generar contraseña aleatoria
+function generatePassword(inputId) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById(inputId).value = password;
+}
+</script>
+{% endblock %}
