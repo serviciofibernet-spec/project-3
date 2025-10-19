@@ -1,0 +1,7 @@
+# Optional rewrite for /acs to acs.php (Apache)
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^acs$ acs.php [L,QSA]
+</IfModule>
