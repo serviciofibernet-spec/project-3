@@ -1,0 +1,53 @@
+# TR-069 ACS .htaccess configuration
+
+# Enable rewrite engine
+RewriteEngine On
+
+# Redirect to HTTPS (uncomment if using SSL)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Set default charset
+AddDefaultCharset UTF-8
+
+# Protect sensitive files
+<FilesMatch "^(config\.php|schema\.sql|\.env)$">
+    Require all denied
+</FilesMatch>
+
+# Protect logs directory
+<DirectoryMatch "logs">
+    Require all denied
+</DirectoryMatch>
+
+# Set proper MIME types
+AddType application/xml .xml
+
+# Enable compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Browser caching
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Disable directory listing
+Options -Indexes
+
+# Custom error pages (optional)
+# ErrorDocument 404 /404.php
+# ErrorDocument 500 /500.php
