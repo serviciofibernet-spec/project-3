@@ -1,0 +1,17 @@
+# TR069 ACS Server Requirements
+
+# Core dependencies
+Flask==3.0.0
+flask-cors==4.0.0
+Werkzeug==3.0.0
+
+# Optional dependencies for enhanced features
+requests==2.31.0       # For making HTTP requests to devices
+cryptography==41.0.5   # For enhanced security features
+pycryptodome==3.19.0  # For encryption support
+
+# Development dependencies (optional)
+pytest==7.4.3         # For testing
+pytest-cov==4.1.0     # For coverage reports
+black==23.10.1        # For code formatting
+flake8==6.1.0        # For linting
