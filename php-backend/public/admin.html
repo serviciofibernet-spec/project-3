@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin ACS (PHP)</title>
+  <style>
+    body{font-family:system-ui, sans-serif;max-width:1000px;margin:40px auto;padding:0 16px}
+    table{width:100%;border-collapse:collapse}
+    th,td{border:1px solid #ddd;padding:6px}
+    input,select,button{padding:6px}
+  </style>
+</head>
+<body>
+  <h1>Admin - Dispositivos</h1>
+  <div>
+    <button id="refresh">Refrescar</button>
+  </div>
+  <table id="devicesTbl">
+    <thead><tr><th>ID</th><th>ACS ID</th><th>Serial</th><th>Modelo</th><th>Cliente</th><th>Perfil</th><th>Acción</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <script>
+    async function loadDevices(){
+      const r = await fetch('/api/admin/devices');
+      const devices = await r.json();
+      const tbody = document.querySelector('#devicesTbl tbody');
+      tbody.innerHTML = '';
+      for (const d of devices){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${d.id}</td>
+          <td>${d.acs_id}</td>
+          <td>${d.serial || ''}</td>
+          <td>${d.model || ''}</td>
+          <td><input value="${d.customer_id || ''}" size="6"/></td>
+          <td><input value="${d.profile_id || ''}" size="6"/></td>
+          <td><button>Guardar</button></td>
+        `;
+        const btn = tr.querySelector('button');
+        btn.onclick = async () => {
+          const customerId = tr.querySelectorAll('input')[0].value || null;
+          const profileId = tr.querySelectorAll('input')[1].value || null;
+          await fetch('/api/admin/assign', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ deviceId: d.id, customerId: customerId?Number(customerId):null, profileId: profileId?Number(profileId):null }) });
+          await loadDevices();
+        };
+        tbody.appendChild(tr);
+      }
+    }
+    document.getElementById('refresh').onclick = loadDevices;
+    loadDevices();
+  </script>
+</body>
+</html>

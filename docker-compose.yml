@@ -72,26 +72,24 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
-  backend:
+  php:
     build:
-      context: ./backend
+      context: ./php-backend
       dockerfile: Dockerfile
     environment:
-      - PORT=8080
       - GENIEACS_NBI_URL=http://genieacs-nbi:7557
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
       - MYSQL_USER=acs
       - MYSQL_PASSWORD=acs
       - MYSQL_DB=acs
-      - NODE_ENV=development
     depends_on:
       - genieacs-nbi
       - mysql
     ports:
-      - "8080:8080"
+      - "8080:80"
     volumes:
-      - ./backend:/usr/src/app
+      - ./php-backend:/var/www
 
 volumes:
   mongo_data:

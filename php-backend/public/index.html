@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cliente ONT - Cambiar WiFi</title>
+  <style>
+    body{font-family:system-ui, sans-serif;max-width:720px;margin:40px auto;padding:0 16px}
+    label{display:block;margin:12px 0 4px}
+    input,button{font-size:16px;padding:8px;width:100%}
+    .card{border:1px solid #ddd;border-radius:8px;padding:16px;margin:16px 0}
+  </style>
+</head>
+<body>
+  <h1>Panel del Cliente</h1>
+  <div class="card">
+    <label>Identificador de ONT (Serial o ACS ID)</label>
+    <input id="deviceId" placeholder="HWTC12345678" />
+  </div>
+  <div class="card">
+    <h2>WiFi 2.4 GHz</h2>
+    <label>SSID</label>
+    <input id="ssid24" />
+    <label>Contraseña</label>
+    <input id="pass24" type="password" />
+  </div>
+  <div class="card">
+    <h2>WiFi 5 GHz</h2>
+    <label>SSID</label>
+    <input id="ssid5" />
+    <label>Contraseña</label>
+    <input id="pass5" type="password" />
+  </div>
+  <button id="save">Aplicar Cambios</button>
+  <pre id="out"></pre>
+  <script>
+    document.getElementById('save').onclick = async () => {
+      const id = document.getElementById('deviceId').value.trim();
+      const ssid24 = document.getElementById('ssid24').value.trim();
+      const pass24 = document.getElementById('pass24').value.trim();
+      const ssid5 = document.getElementById('ssid5').value.trim();
+      const pass5 = document.getElementById('pass5').value.trim();
+      const res = await fetch(`/api/devices/${encodeURIComponent(id)}/wifi`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ ssid24, pass24, ssid5, pass5 })
+      });
+      const data = await res.json();
+      document.getElementById('out').textContent = JSON.stringify(data, null, 2);
+    };
+  </script>
+</body>
+</html>
