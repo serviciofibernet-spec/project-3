@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Initial Provision",
+    "weight": 0,
+    "precondition": "!tags.includes('provisioned')",
+    "config": {
+      "refresh": {
+        "InternetGatewayDevice": {"_object": {"_w": true}}
+      }
+    }
+  }
+]
