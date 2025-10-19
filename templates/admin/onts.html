@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}ONTs - Administración{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">ONTs</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshONTs()">
+                <i class="fas fa-sync-alt"></i> Actualizar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <label for="search" class="form-label">Buscar</label>
+                <input type="text" class="form-control" id="search" name="search" 
+                       value="{{ request.args.get('search', '') }}" 
+                       placeholder="Serial, MAC, IP...">
+            </div>
+            <div class="col-md-2">
+                <label for="status" class="form-label">Estado</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="all" {% if request.args.get('status') == 'all' %}selected{% endif %}>Todos</option>
+                    <option value="online" {% if request.args.get('status') == 'online' %}selected{% endif %}>Online</option>
+                    <option value="offline" {% if request.args.get('status') == 'offline' %}selected{% endif %}>Offline</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="model" class="form-label">Modelo</label>
+                <select class="form-select" id="model" name="model">
+                    <option value="all" {% if request.args.get('model') == 'all' %}selected{% endif %}>Todos</option>
+                    {% for model in models %}
+                    <option value="{{ model }}" {% if request.args.get('model') == model %}selected{% endif %}>{{ model }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <a href="{{ url_for('admin.onts') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Limpiar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabla de ONTs -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Serial</th>
+                        <th>Modelo</th>
+                        <th>IP</th>
+                        <th>Estado</th>
+                        <th>Cliente</th>
+                        <th>Última Conexión</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ont in onts.items %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('admin.ont_detail', ont_id=ont.id) }}" 
+                               class="text-decoration-none">
+                                {{ ont.serial_number }}
+                            </a>
+                        </td>
+                        <td>{{ ont.model }}</td>
+                        <td>{{ ont.ip_address or 'N/A' }}</td>
+                        <td>
+                            {% if ont.is_online %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-circle"></i> Online
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-circle"></i> Offline
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if ont.customer %}
+                                <a href="{{ url_for('admin.customer_detail', customer_id=ont.customer.id) }}" 
+                                   class="text-decoration-none">
+                                    {{ ont.customer.full_name or ont.customer.username }}
+                                </a>
+                            {% else %}
+                                <span class="text-muted">Sin asignar</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if ont.last_seen %}
+                                <span title="{{ ont.last_seen.strftime('%d/%m/%Y %H:%M:%S') }}">
+                                    {{ ont.last_seen.strftime('%d/%m/%Y %H:%M') }}
+                                </span>
+                            {% else %}
+                                <span class="text-muted">Nunca</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{{ url_for('admin.ont_detail', ont_id=ont.id) }}" 
+                                   class="btn btn-outline-primary" title="Ver detalles">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('admin.configure_ont', ont_id=ont.id) }}" 
+                                   class="btn btn-outline-success" title="Configurar">
+                                    <i class="fas fa-cogs"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-warning" 
+                                        onclick="rebootONT({{ ont.id }})" title="Reiniciar">
+                                    <i class="fas fa-power-off"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        {% if onts.pages > 1 %}
+        <nav aria-label="Paginación de ONTs">
+            <ul class="pagination justify-content-center">
+                {% if onts.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin.onts', page=onts.prev_num, **request.args) }}">
+                        <i class="fas fa-chevron-left"></i> Anterior
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for page_num in onts.iter_pages() %}
+                    {% if page_num %}
+                        {% if page_num != onts.page %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('admin.onts', page=page_num, **request.args) }}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if onts.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin.onts', page=onts.next_num, **request.args) }}">
+                        Siguiente <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function refreshONTs() {
+    location.reload();
+}
+
+function rebootONT(ontId) {
+    if (confirm('¿Estás seguro de que quieres reiniciar esta ONT?')) {
+        fetch(`/admin/onts/${ontId}/reboot`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert('Comando de reinicio enviado correctamente');
+                location.reload();
+            } else {
+                alert('Error al enviar comando de reinicio');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al enviar comando de reinicio');
+        });
+    }
+}
+
+// Auto-refresh cada 30 segundos
+setInterval(function() {
+    // Solo actualizar si no hay filtros activos
+    if (!window.location.search) {
+        location.reload();
+    }
+}, 30000);
+</script>
+{% endblock %}

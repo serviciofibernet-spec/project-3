@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: tr069_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: tr069_onts
+      MYSQL_USER: tr069
+      MYSQL_PASSWORD: tr069pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - tr069_network
+    restart: unless-stopped
+
+  tr069_server:
+    build: .
+    container_name: tr069_server
+    environment:
+      - DATABASE_URL=mysql+pymysql://tr069:tr069pass@mysql:3306/tr069_onts
+      - TR069_ACS_URL=http://localhost:5000/acs
+      - TR069_ACS_PORT=7547
+    ports:
+      - "5000:5000"
+      - "7547:7547"
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    depends_on:
+      - mysql
+    networks:
+      - tr069_network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: tr069_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - tr069_server
+    networks:
+      - tr069_network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+networks:
+  tr069_network:
+    driver: bridge

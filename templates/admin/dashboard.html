@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Administración{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-download"></i> Exportar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas principales -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2 card-hover">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total ONTs
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_onts }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-wifi fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2 card-hover">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            ONTs Online
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ online_onts }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2 card-hover">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Clientes Activos
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_customers }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2 card-hover">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            ONTs con Problemas
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ monitoring_stats.low_power_onts }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- ONTs Recientes -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">ONTs Recientes</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Serial</th>
+                                <th>Modelo</th>
+                                <th>IP</th>
+                                <th>Estado</th>
+                                <th>Cliente</th>
+                                <th>Última Conexión</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ont in recent_onts %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('admin.ont_detail', ont_id=ont.id) }}">
+                                        {{ ont.serial_number }}
+                                    </a>
+                                </td>
+                                <td>{{ ont.model }}</td>
+                                <td>{{ ont.ip_address or 'N/A' }}</td>
+                                <td>
+                                    {% if ont.is_online %}
+                                        <span class="badge bg-success">Online</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Offline</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ ont.customer.full_name if ont.customer else 'Sin asignar' }}</td>
+                                <td>
+                                    {% if ont.last_seen %}
+                                        {{ ont.last_seen.strftime('%d/%m/%Y %H:%M') }}
+                                    {% else %}
+                                        Nunca
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ONTs con Problemas -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-warning">ONTs con Problemas</h6>
+            </div>
+            <div class="card-body">
+                {% if problem_onts %}
+                    {% for ont in problem_onts %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="fw-bold">{{ ont.serial_number }}</div>
+                            <div class="text-muted small">{{ ont.model }}</div>
+                            <div class="text-muted small">
+                                {% if ont.last_seen %}
+                                    Última conexión: {{ ont.last_seen.strftime('%d/%m/%Y %H:%M') }}
+                                {% else %}
+                                    Sin conexión
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <p>No hay ONTs con problemas</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos de Monitoreo -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Estado de las ONTs</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="ontStatusChart" width="400" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Gráfico de estado de ONTs
+const ctx = document.getElementById('ontStatusChart').getContext('2d');
+const ontStatusChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Online', 'Offline'],
+        datasets: [{
+            data: [{{ online_onts }}, {{ total_onts - online_onts }}],
+            backgroundColor: ['#28a745', '#dc3545'],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
