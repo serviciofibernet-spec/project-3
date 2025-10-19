@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TR069 Huawei ONT Management Server</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+        }
+        .feature-card {
+            transition: transform 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .btn-custom {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+        }
+        .btn-custom:hover {
+            background: linear-gradient(45deg, #5a6fd8, #6a4190);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-router"></i> TR069 ACS Server
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Características</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Panel Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/client">Portal Cliente</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/api/docs">API Docs</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 mb-4">Servidor TR069 para ONT Huawei</h1>
+            <p class="lead mb-5">Gestión automatizada completa de equipos ONT con configuración remota, monitoreo en tiempo real y portales de autoservicio</p>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <a href="/admin" class="btn btn-light btn-lg w-100">
+                                <i class="bi bi-gear-fill me-2"></i>Panel de Administración
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="/client" class="btn btn-outline-light btn-lg w-100">
+                                <i class="bi bi-person-circle me-2"></i>Portal de Cliente
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col">
+                    <h2 class="display-5 mb-3">Características Principales</h2>
+                    <p class="lead text-muted">Sistema completo de gestión TR069 con todas las funcionalidades necesarias</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Device Management -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="bi bi-router-fill text-primary" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="card-title">Gestión de Dispositivos</h5>
+                            <p class="card-text">Cambio remoto de SSID y contraseñas WiFi, configuración de DNS, VLAN, PPPoE y parámetros de red.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monitoring -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="bi bi-graph-up text-success" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="card-title">Monitoreo y Diagnóstico</h5>
+                            <p class="card-text">Visualización de potencia óptica (dBm), estado de conexión, nivel de señal y dispositivos conectados al WiFi.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Automation -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="bi bi-lightning-charge text-warning" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="card-title">Automatización Masiva</h5>
+                            <p class="card-text">Perfiles automáticos que configuran las ONT al conectarse y asignación automática a clientes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Remote Operations -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="bi bi-arrow-clockwise text-info" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="card-title">Operaciones Remotas</h5>
+                            <p class="card-text">Reinicio remoto de equipos, actualizaciones de firmware y reset de fábrica desde el panel web.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client Portal -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="bi bi-person-check text-purple" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="card-title">Portal de Cliente</h5>
+                            <p class="card-text">Panel web donde los clientes pueden cambiar su WiFi sin necesidad de soporte técnico.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Integration -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="bi bi-diagram-3 text-danger" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="card-title">Integración Completa</h5>
+                            <p class="card-text">Detección automática de ONT, base de datos MySQL y API REST completa para integraciones.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Specs -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="display-6 mb-4">Especificaciones Técnicas</h2>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-center mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <span>Protocolo TR069/CWMP completo</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-center mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <span>Compatible con ONT Huawei</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-center mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <span>Base de datos MySQL</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-center mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <span>API REST completa</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-center mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <span>Interfaz web responsive</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-center mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <span>Logs y monitoreo detallado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Start -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <h2 class="text-center mb-4">Inicio Rápido</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Configuración del Servidor</h5>
+                            <pre class="bg-dark text-light p-3 rounded"><code># 1. Instalar dependencias
+npm install
+
+# 2. Configurar variables de entorno
+cp .env.example .env
+# Editar .env con tu configuración
+
+# 3. Crear base de datos
+npm run migrate
+
+# 4. Iniciar servidor
+npm start</code></pre>
+                            <div class="mt-3">
+                                <p><strong>Endpoints principales:</strong></p>
+                                <ul>
+                                    <li><code>POST /acs</code> - Endpoint TR069 CWMP</li>
+                                    <li><code>GET /admin</code> - Panel de administración</li>
+                                    <li><code>GET /client</code> - Portal de cliente</li>
+                                    <li><code>GET /api/docs</code> - Documentación API</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>TR069 Huawei ONT Server</h5>
+                    <p class="mb-0">Sistema completo de gestión automatizada para equipos ONT</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">
+                        <a href="/api/health" class="text-light me-3">Estado del Sistema</a>
+                        <a href="/api/docs" class="text-light">Documentación API</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
