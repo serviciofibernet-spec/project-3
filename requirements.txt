@@ -1,0 +1,35 @@
+# TR-069 Server Dependencies
+# Core web framework
+aiohttp>=3.8.0
+
+# Security and authentication
+bcrypt>=4.0.0
+PyJWT>=2.6.0
+
+# Database (SQLite is included with Python)
+# For PostgreSQL support (optional): psycopg2-binary>=2.9.0
+# For MySQL support (optional): PyMySQL>=1.0.0
+
+# XML processing (included with Python)
+# lxml>=4.9.0  # Optional: for better XML performance
+
+# Configuration and utilities
+python-dotenv>=1.0.0
+
+# Development and testing (optional)
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.0.0
+
+# Logging and monitoring (optional)
+structlog>=22.0.0
+
+# SSL/TLS support (optional)
+cryptography>=3.4.0
+
+# Web interface dependencies (optional)
+jinja2>=3.1.0
+aiohttp-jinja2>=1.5.0
+
+# API documentation (optional)
+aiohttp-swagger>=1.0.16
