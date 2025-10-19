@@ -1,0 +1,16 @@
+<?php
+return [
+    'db' => [
+        'host' => 'localhost',
+        'port' => 3306,
+        'name' => 'tr069',
+        'user' => 'root',
+        'pass' => '',
+        'charset' => 'utf8mb4',
+    ],
+    'acs' => [
+        'username' => null,
+        'password' => null,
+        'timezone' => 'UTC',
+    ],
+];
