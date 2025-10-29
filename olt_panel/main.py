@@ -2,7 +2,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from .api.routes import api_router
+from .api import api_router
 
 APP_VERSION = "0.1.0"
 
