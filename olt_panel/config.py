@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Literal
 
 import yaml
 from pydantic import BaseModel, Field
@@ -12,6 +12,7 @@ class OLTDeviceConfig(BaseModel):
     name: str
     host: str
     port: int = 22
+    protocol: Literal["ssh", "telnet"] = Field(default="ssh", description="Transport protocol")
     username: str
     password: str
     driver: str = Field(default="zte_c300_v2", description="Driver key, e.g. zte_c300_v2")

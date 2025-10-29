@@ -4,27 +4,45 @@ from abc import ABC, abstractmethod
 from typing import Iterable, Optional
 
 from ..config import OLTDeviceConfig
-from ..network.ssh_client import SSHClient, SSHClientConfig
+from ..network import (
+    SSHClient,
+    SSHClientConfig,
+    TelnetClient,
+    TelnetClientConfig,
+)
 
 
 class OLTDriver(ABC):
     def __init__(self, device: OLTDeviceConfig):
         self.device = device
 
-    def _new_ssh(self) -> SSHClient:
-        ssh_cfg = SSHClientConfig(
-            host=self.device.host,
-            port=self.device.port,
-            username=self.device.username,
-            password=self.device.password,
-            prompt_regex=self.device.prompt_regex or r"[#>] ?$",
-            timeout_s=self.device.ssh_timeout_s,
-        )
-        return SSHClient(ssh_cfg)
+    def _new_client(self):
+        prompt = self.device.prompt_regex or r"[#>] ?$"
+        timeout_s = self.device.ssh_timeout_s
+        if self.device.protocol == "telnet":
+            t_cfg = TelnetClientConfig(
+                host=self.device.host,
+                port=self.device.port,
+                username=self.device.username,
+                password=self.device.password,
+                prompt_regex=prompt,
+                timeout_s=timeout_s,
+            )
+            return TelnetClient(t_cfg)
+        else:
+            ssh_cfg = SSHClientConfig(
+                host=self.device.host,
+                port=self.device.port,
+                username=self.device.username,
+                password=self.device.password,
+                prompt_regex=prompt,
+                timeout_s=timeout_s,
+            )
+            return SSHClient(ssh_cfg)
 
     def send_raw_commands(self, commands: Iterable[str], stop_on_error: bool = False) -> str:
-        with self._new_ssh() as ssh:
-            return ssh.run_commands(commands, stop_on_error=stop_on_error)
+        with self._new_client() as cli:
+            return cli.run_commands(commands, stop_on_error=stop_on_error)
 
     @abstractmethod
     def get_version(self) -> str:
