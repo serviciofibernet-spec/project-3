@@ -1,0 +1,23 @@
+# Copie este archivo a config.yml y edite los valores
+# Lista de OLTs administradas por el panel
+devices:
+  - name: "ZTE-OLT"
+    host: "192.0.2.10"   # IP de la OLT
+    port: 22
+    protocol: "ssh"
+    username: "admin"
+    password: "admin_password"
+    driver: "zte_c300_v2"
+    # Ajuste el prompt si su OLT es distinto
+    prompt_regex: "[#>] ?$"
+    ssh_timeout_s: 15
+  # Ejemplo usando TELNET
+  # - name: "ZTE-OLT-TELNET"
+  #   host: "10.10.0.80"
+  #   port: 23
+  #   protocol: "telnet"
+  #   username: "nettwisp"
+  #   password: "nettwisp"
+  #   driver: "zte_c300_v2"
+  #   prompt_regex: "[#>] ?$"
+  #   ssh_timeout_s: 15

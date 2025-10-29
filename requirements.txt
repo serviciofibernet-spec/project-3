@@ -1,0 +1,7 @@
+fastapi>=0.111
+uvicorn[standard]>=0.23
+pydantic>=2.0
+PyYAML>=6.0
+paramiko>=3.3
+pysnmp>=4.4.12
+aiofiles>=23.1.0
