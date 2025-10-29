@@ -1,0 +1,12 @@
+# Copie este archivo a config.yml y edite los valores
+# Lista de OLTs administradas por el panel
+devices:
+  - name: "ZTE-OLT"
+    host: "192.0.2.10"   # IP de la OLT
+    port: 22
+    username: "admin"
+    password: "admin_password"
+    driver: "zte_c300_v2"
+    # Ajuste el prompt si su OLT es distinto
+    prompt_regex: "[#>] ?$"
+    ssh_timeout_s: 15
